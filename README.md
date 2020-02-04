@@ -25,7 +25,7 @@ See live demo: [pay.cards](https://play.google.com/store/apps/details?id=cards.p
 
 ### Usage
 
-Build an Intent using the `ScanCardIntent.Builder` and start a new activity to perform the scan:
+Build an Intent using the `ScanCardFragment.Builder` and start a new activity to perform the scan:
 
 
 ```java
@@ -34,7 +34,7 @@ static final int REQUEST_CODE_SCAN_CARD = 1;
 ...
      
 private void scanCard() {
-  Intent intent = new ScanCardIntent.Builder(this).build();
+  Intent intent = new ScanCardFragment.Builder(this).build();
   startActivityForResult(intent, REQUEST_CODE_SCAN_CARD);
 }
 ```
@@ -47,7 +47,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == REQUEST_CODE_SCAN_CARD) {
         if (resultCode == Activity.RESULT_OK) {
-            Card card = data.getParcelableExtra(ScanCardIntent.RESULT_PAYCARDS_CARD);
+            Card card = data.getParcelableExtra(ScanCardFragment.RESULT_PAYCARDS_CARD);
             String cardData = "Card number: " + card.getCardNumberRedacted() + "\n"
                             + "Card holder: " + card.getCardHolderName() + "\n"
                             + "Card expiration date: " + card.getExpirationDate();

@@ -1,5 +1,6 @@
 package cards.pay.paycardsrecognizer.sdk.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -8,25 +9,23 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
 import cards.pay.paycardsrecognizer.sdk.R;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.ScanManager;
 import cards.pay.paycardsrecognizer.sdk.camera.widget.CameraPreviewLayout;
 import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionResult;
@@ -61,8 +60,6 @@ public class ScanCardFragment extends Fragment {
 
     private InteractionListener mListener;
 
-    private ScanCardRequest mRequest;
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -76,18 +73,15 @@ public class ScanCardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRequest = null;
-        if (getArguments() != null) {
-            mRequest = getArguments().getParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST);
-        }
-        if (mRequest == null) mRequest = ScanCardRequest.getDefault();
     }
 
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
-        if (Constants.DEBUG) Log.d(TAG, "onCreateAnimation() called with: " +  "transit = [" + transit + "], enter = [" + enter + "], nextAnim = [" + nextAnim + "]");
+        if (Constants.DEBUG)
+            Log.d(TAG, "onCreateAnimation() called with: " + "transit = [" + transit + "], enter = [" + enter + "], nextAnim = [" + nextAnim + "]");
         // SurfaceView is hard to animate
-        Animation a = new Animation() {};
+        Animation a = new Animation() {
+        };
         a.setDuration(0);
         return a;
     }
@@ -95,7 +89,7 @@ public class ScanCardFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root =  inflater.inflate(R.layout.wocr_fragment_scan_card, container, false);
+        View root = inflater.inflate(R.layout.wocr_fragment_scan_card, container, false);
 
         mProgressBar = root.findViewById(R.id.wocr_progress_bar);
 
@@ -110,6 +104,25 @@ public class ScanCardFragment extends Fragment {
         return root;
     }
 
+    public static final boolean isScanCardHolderEnabled = true;
+    public static final boolean isScanExpirationDateEnabled = true;
+    public static final boolean isGrabCardImageEnabled = false;
+    public static final boolean isSoundEnabled = false;
+
+    public static final int RESULT_CODE_ERROR = Activity.RESULT_FIRST_USER;
+
+    public static final String RESULT_PAYCARDS_CARD = "RESULT_PAYCARDS_CARD";
+    public static final String RESULT_CARD_IMAGE = "RESULT_CARD_IMAGE";
+    public static final String RESULT_CANCEL_REASON = "RESULT_CANCEL_REASON";
+
+    public static final int BACK_PRESSED = 1;
+    public static final int ADD_MANUALLY_PRESSED = 2;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {BACK_PRESSED, ADD_MANUALLY_PRESSED})
+    public @interface CancelReason {
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -121,9 +134,9 @@ public class ScanCardFragment extends Fragment {
         }
 
         int recognitionMode = RECOGNIZER_MODE_NUMBER;
-        if (mRequest.isScanCardHolderEnabled()) recognitionMode |=  RECOGNIZER_MODE_NAME;
-        if (mRequest.isScanExpirationDateEnabled()) recognitionMode |= RECOGNIZER_MODE_DATE;
-        if (mRequest.isGrabCardImageEnabled()) recognitionMode |= RECOGNIZER_MODE_GRAB_CARD_IMAGE;
+        if (isScanCardHolderEnabled) recognitionMode |= RECOGNIZER_MODE_NAME;
+        if (isScanExpirationDateEnabled) recognitionMode |= RECOGNIZER_MODE_DATE;
+        if (isGrabCardImageEnabled) recognitionMode |= RECOGNIZER_MODE_GRAB_CARD_IMAGE;
 
         mScanManager = new ScanManager(recognitionMode, getActivity(), mCameraPreviewLayout, new ScanManager.Callbacks() {
 
@@ -136,7 +149,8 @@ public class ScanCardFragment extends Fragment {
                 if (getView() == null) return;
                 mProgressBar.hideSlow();
                 mCameraPreviewLayout.setBackgroundDrawable(null);
-                if (mFlashButton != null) mFlashButton.setVisibility(isFlashSupported ? View.VISIBLE : View.GONE);
+                if (mFlashButton != null)
+                    mFlashButton.setVisibility(isFlashSupported ? View.VISIBLE : View.GONE);
 
                 innitSoundPool();
             }
@@ -159,7 +173,7 @@ public class ScanCardFragment extends Fragment {
                     if (TextUtils.isEmpty(result.getDate())) {
                         date = null;
                     } else {
-                        date =  result.getDate().substring(0, 2) + '/' + result.getDate().substring(2);
+                        date = result.getDate().substring(0, 2) + '/' + result.getDate().substring(2);
                     }
 
                     Card card = new Card(result.getNumber(), result.getName(), date);
@@ -175,13 +189,16 @@ public class ScanCardFragment extends Fragment {
             }
 
             @Override
-            public void onFpsReport(String report) {}
+            public void onFpsReport(String report) {
+            }
 
             @Override
-            public void onAutoFocusMoving(boolean start, String cameraFocusMode) {}
+            public void onAutoFocusMoving(boolean start, String cameraFocusMode) {
+            }
 
             @Override
-            public void onAutoFocusComplete(boolean success, String cameraFocusMode) {}
+            public void onAutoFocusComplete(boolean success, String cameraFocusMode) {
+            }
 
             @Nullable
             private byte[] compressCardImage(Bitmap img) {
@@ -240,7 +257,7 @@ public class ScanCardFragment extends Fragment {
     }
 
     private void innitSoundPool() {
-        if (mRequest.isSoundEnabled()) {
+        if (isSoundEnabled) {
             mSoundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
             mCapturedSoundId = mSoundPool.load(getActivity(), R.raw.wocr_capture_card, 0);
         }
@@ -252,11 +269,12 @@ public class ScanCardFragment extends Fragment {
             public void onClick(final View v) {
                 if (v.isEnabled()) {
                     v.setEnabled(false);
-                    if (mListener != null) mListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
+                    if (mListener != null)
+                        mListener.onScanCardCanceled(ScanCardFragment.ADD_MANUALLY_PRESSED);
                 }
             }
         });
-        if(mFlashButton != null) {
+        if (mFlashButton != null) {
             mFlashButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
@@ -264,12 +282,6 @@ public class ScanCardFragment extends Fragment {
                 }
             });
         }
-
-        TextView paycardsLink = (TextView)view.findViewById(R.id.wocr_powered_by_paycards_link);
-        SpannableString link = new SpannableString(getText(R.string.wocr_powered_by_pay_cards));
-        link.setSpan(new URLSpan(Constants.PAYCARDS_URL), 0, link.length(), SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
-        paycardsLink.setText(link);
-        paycardsLink.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void showMainContent() {
@@ -299,8 +311,10 @@ public class ScanCardFragment extends Fragment {
     }
 
     public interface InteractionListener {
-        void onScanCardCanceled(@ScanCardIntent.CancelReason int cancelReason);
+        void onScanCardCanceled(@ScanCardFragment.CancelReason int cancelReason);
+
         void onScanCardFailed(Exception e);
+
         void onScanCardFinished(Card card, byte cardImage[]);
     }
 }

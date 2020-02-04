@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import java.lang.ref.WeakReference;
 
 import cards.pay.paycardsrecognizer.sdk.R;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionCoreUtils;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
@@ -37,7 +36,8 @@ public final class InitLibraryFragment extends Fragment {
     private View mProgressBar;
     private CameraPreviewLayout mCameraPreviewLayout;
     private ViewGroup mMainContent;
-    private @Nullable View mFlashButton;
+    private @Nullable
+    View mFlashButton;
 
     private DeployCoreTask mDeployCoreTask;
 
@@ -66,7 +66,8 @@ public final class InitLibraryFragment extends Fragment {
         enterManuallyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View clickview) {
-                if (mListener != null) mListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
+                if (mListener != null)
+                    mListener.onScanCardCanceled(ScanCardFragment.ADD_MANUALLY_PRESSED);
             }
         });
         return root;
@@ -89,7 +90,7 @@ public final class InitLibraryFragment extends Fragment {
         RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(getContext());
         if (checkResult.isFailedOnCameraPermission()) {
             if (savedInstanceState == null) {
-                requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
             }
         } else {
             subscribeToInitCore(getActivity());
@@ -105,7 +106,7 @@ public final class InitLibraryFragment extends Fragment {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     subscribeToInitCore(getActivity());
                 } else {
-                    if (mListener != null ) mListener.onInitLibraryFailed(
+                    if (mListener != null) mListener.onInitLibraryFailed(
                             new RecognitionUnavailableException(RecognitionUnavailableException.ERROR_NO_CAMERA_PERMISSION));
                 }
                 return;
@@ -144,8 +145,10 @@ public final class InitLibraryFragment extends Fragment {
     }
 
     public interface InteractionListener {
-        void onScanCardCanceled(@ScanCardIntent.CancelReason int actionId);
+        void onScanCardCanceled(@ScanCardFragment.CancelReason int actionId);
+
         void onInitLibraryFailed(Throwable e);
+
         void onInitLibraryComplete();
     }
 

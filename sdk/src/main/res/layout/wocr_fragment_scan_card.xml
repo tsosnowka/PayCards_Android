@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:keepScreenOn="true"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:keepScreenOn="true"
     tools:context=".ui.ScanCardActivity">
 
     <RelativeLayout
@@ -16,24 +14,19 @@
         android:visibility="invisible"
         tools:visibility="visible">
 
-        <include layout="@layout/wocr_include_card_detection_layout" />
-
-        <android.support.v7.widget.AppCompatImageButton
-            android:id="@+id/wocr_iv_flash_id"
-            style="@style/wocr_FlashButton"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/wocr_ic_flash"
-            tools:visibility="visible"
-            tools:ignore="RtlHardcoded" />
+        <include
+            layout="@layout/wocr_include_card_detection_layout"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginTop="50dp" />
 
         <cards.pay.paycardsrecognizer.sdk.ui.views.ButtonWithTopBorder
-            style="@style/wocr_EnterManuallyButton"
             android:id="@+id/wocr_tv_enter_card_number_id"
+            style="@style/wocr_EnterManuallyButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:includeFontPadding="false"
             android:layout_gravity="bottom"
+            android:includeFontPadding="false"
             android:text="@string/wocr_button_enter_card_number" />
 
     </RelativeLayout>

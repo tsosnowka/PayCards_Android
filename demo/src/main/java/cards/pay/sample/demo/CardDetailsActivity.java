@@ -19,8 +19,8 @@ import android.widget.EditText;
 import java.lang.reflect.Method;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent.CancelReason;
+import cards.pay.paycardsrecognizer.sdk.ui.ScanCardActivity;
+import cards.pay.paycardsrecognizer.sdk.ui.ScanCardFragment;
 import cards.pay.sample.demo.validation.CardExpiryDateValidator;
 import cards.pay.sample.demo.validation.CardHolderValidator;
 import cards.pay.sample.demo.validation.CardNumberValidator;
@@ -92,21 +92,21 @@ public class CardDetailsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_SCAN_CARD) {
             if (resultCode == Activity.RESULT_OK) {
-                Card card = data.getParcelableExtra(ScanCardIntent.RESULT_PAYCARDS_CARD);
+                Card card = data.getParcelableExtra(ScanCardFragment.RESULT_PAYCARDS_CARD);
                 if (BuildConfig.DEBUG) Log.i(TAG, "Card info: " + card);
                 setCard(card);
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                @CancelReason final int reason;
+                @ScanCardFragment.CancelReason final int reason;
                 if (data != null) {
-                    reason = data.getIntExtra(ScanCardIntent.RESULT_CANCEL_REASON, ScanCardIntent.BACK_PRESSED);
+                    reason = data.getIntExtra(ScanCardFragment.RESULT_CANCEL_REASON, ScanCardFragment.BACK_PRESSED);
                 } else {
-                    reason = ScanCardIntent.BACK_PRESSED;
+                    reason = ScanCardFragment.BACK_PRESSED;
                 }
 
-                if (reason == ScanCardIntent.ADD_MANUALLY_PRESSED) {
+                if (reason == ScanCardFragment.ADD_MANUALLY_PRESSED) {
                     showIme(mCardNumberField.getEditText());
                 }
-            } else if (resultCode == ScanCardIntent.RESULT_CODE_ERROR) {
+            } else if (resultCode == ScanCardFragment.RESULT_CODE_ERROR) {
                 Log.i(TAG, "Scan failed");
             }
         }
@@ -153,7 +153,7 @@ public class CardDetailsActivity extends AppCompatActivity {
     }
 
     private void scanCard() {
-        Intent intent = new ScanCardIntent.Builder(this).build();
+        Intent intent = new Intent(this, ScanCardActivity.class);
         startActivityForResult(intent, REQUEST_CODE_SCAN_CARD);
     }
 
