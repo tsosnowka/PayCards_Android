@@ -1,7 +1,6 @@
 package cards.pay.paycardsrecognizer.sdk.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -41,6 +40,24 @@ import static cards.pay.paycardsrecognizer.sdk.ndk.RecognitionConstants.RECOGNIZ
 public class ScanCardFragment extends Fragment {
     @SuppressWarnings("unused")
     public static final String TAG = "ScanCardFragment";
+    public static final boolean isScanCardHolderEnabled = true;
+    public static final boolean isScanExpirationDateEnabled = true;
+    public static final boolean isGrabCardImageEnabled = false;
+    public static final boolean isSoundEnabled = false;
+
+    public static final int RESULT_CODE_ERROR = Activity.RESULT_FIRST_USER;
+
+    public static final String RESULT_PAYCARDS_CARD = "RESULT_PAYCARDS_CARD";
+    public static final String RESULT_CARD_IMAGE = "RESULT_CARD_IMAGE";
+    public static final String RESULT_CANCEL_REASON = "RESULT_CANCEL_REASON";
+
+    public static final int BACK_PRESSED = 1;
+    public static final int ADD_MANUALLY_PRESSED = 2;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {BACK_PRESSED, ADD_MANUALLY_PRESSED})
+    public @interface CancelReason {
+    }
 
     private CameraPreviewLayout mCameraPreviewLayout;
 
@@ -58,17 +75,7 @@ public class ScanCardFragment extends Fragment {
 
     private int mCapturedSoundId = -1;
 
-    private InteractionListener mListener;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (InteractionListener) getActivity();
-        } catch (ClassCastException ex) {
-            throw new RuntimeException("Parent must implement " + InteractionListener.class.getSimpleName());
-        }
-    }
+    public InteractionListener mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,24 +111,6 @@ public class ScanCardFragment extends Fragment {
         return root;
     }
 
-    public static final boolean isScanCardHolderEnabled = true;
-    public static final boolean isScanExpirationDateEnabled = true;
-    public static final boolean isGrabCardImageEnabled = false;
-    public static final boolean isSoundEnabled = false;
-
-    public static final int RESULT_CODE_ERROR = Activity.RESULT_FIRST_USER;
-
-    public static final String RESULT_PAYCARDS_CARD = "RESULT_PAYCARDS_CARD";
-    public static final String RESULT_CARD_IMAGE = "RESULT_CARD_IMAGE";
-    public static final String RESULT_CANCEL_REASON = "RESULT_CANCEL_REASON";
-
-    public static final int BACK_PRESSED = 1;
-    public static final int ADD_MANUALLY_PRESSED = 2;
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef(value = {BACK_PRESSED, ADD_MANUALLY_PRESSED})
-    public @interface CancelReason {
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -310,11 +299,4 @@ public class ScanCardFragment extends Fragment {
         if (mCapturedSoundId >= 0) mSoundPool.play(mCapturedSoundId, 1, 1, 0, 0, 1);
     }
 
-    public interface InteractionListener {
-        void onScanCardCanceled(@ScanCardFragment.CancelReason int cancelReason);
-
-        void onScanCardFailed(Exception e);
-
-        void onScanCardFinished(Card card, byte cardImage[]);
-    }
 }
