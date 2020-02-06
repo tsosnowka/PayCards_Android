@@ -21,7 +21,7 @@ public class InteractionListenerActivityImpl implements InteractionListener {
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public void onScanCardFailed(Exception e) {
         Log.e(TAG, "Scan card failed", new RuntimeException("onScanCardFinishedWithError()", e));
-        activity.setResult(ScanCardFragment.RESULT_CODE_ERROR);
+        activity.setResult(ScanCardActivity.RESULT_CODE_ERROR);
         activity.finish();
     }
 
@@ -29,16 +29,16 @@ public class InteractionListenerActivityImpl implements InteractionListener {
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public void onScanCardFinished(Card card, @Nullable byte cardImage[]) {
         Intent intent = new Intent();
-        intent.putExtra(ScanCardFragment.RESULT_PAYCARDS_CARD, (Parcelable) card);
-        if (cardImage != null) intent.putExtra(ScanCardFragment.RESULT_CARD_IMAGE, cardImage);
+        intent.putExtra(ScanCardActivity.RESULT_PAYCARDS_CARD, (Parcelable) card);
+        if (cardImage != null) intent.putExtra(ScanCardActivity.RESULT_CARD_IMAGE, cardImage);
         activity.setResult(Activity.RESULT_OK, intent);
         activity.finish();
     }
 
     @Override
-    public void onScanCardCanceled(@ScanCardFragment.CancelReason int actionId) {
+    public void onScanCardCanceled(@ScanCardActivity.CancelReason int actionId) {
         Intent intent = new Intent();
-        intent.putExtra(ScanCardFragment.RESULT_CANCEL_REASON, actionId);
+        intent.putExtra(ScanCardActivity.RESULT_CANCEL_REASON, actionId);
         activity.setResult(Activity.RESULT_CANCELED, intent);
         activity.finish();
     }
