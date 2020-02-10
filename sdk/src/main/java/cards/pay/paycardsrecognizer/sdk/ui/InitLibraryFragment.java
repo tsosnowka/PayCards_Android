@@ -30,16 +30,16 @@ public final class InitLibraryFragment extends Fragment {
 
     public static final String TAG = "InitLibraryFragment";
 
-    private InteractionListener mListener;
+    public InteractionListener mListener;
 
-    private static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
+    public static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
 
-    private View mProgressBar;
-    private CameraPreviewLayout mCameraPreviewLayout;
-    private ViewGroup mMainContent;
-    private @Nullable View mFlashButton;
+    public View mProgressBar;
+    public CameraPreviewLayout mCameraPreviewLayout;
+    public ViewGroup mMainContent;
+    public @Nullable View mFlashButton;
 
-    private DeployCoreTask mDeployCoreTask;
+    public DeployCoreTask mDeployCoreTask;
 
     @Override
     public void onAttach(Context context) {
@@ -149,49 +149,4 @@ public final class InitLibraryFragment extends Fragment {
         void onInitLibraryComplete();
     }
 
-    private static class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
-
-        private final WeakReference<InitLibraryFragment> fragmentRef;
-
-        @SuppressLint("StaticFieldLeak")
-        private final Context appContext;
-
-        DeployCoreTask(InitLibraryFragment parent) {
-            this.fragmentRef = new WeakReference<InitLibraryFragment>(parent);
-            this.appContext = parent.getContext().getApplicationContext();
-        }
-
-        @Override
-        protected Throwable doInBackground(Void... voids) {
-            try {
-                RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(appContext);
-                if (checkResult.isFailed()) {
-                    throw new RecognitionUnavailableException();
-                }
-                RecognitionCoreUtils.deployRecognitionCoreSync(appContext);
-                if (!RecognitionCore.getInstance(appContext).isDeviceSupported()) {
-                    throw new RecognitionUnavailableException();
-                }
-                return null;
-            } catch (RecognitionUnavailableException e) {
-                return e;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(@Nullable Throwable lastError) {
-            super.onPostExecute(lastError);
-            InitLibraryFragment fragment = fragmentRef.get();
-            if (fragment == null
-                    || fragment.mProgressBar == null
-                    || fragment.mListener == null) return;
-
-            fragment.mProgressBar.setVisibility(View.GONE);
-            if (lastError == null) {
-                fragment.mListener.onInitLibraryComplete();
-            } else {
-                fragment.mListener.onInitLibraryFailed(lastError);
-            }
-        }
-    }
 }
