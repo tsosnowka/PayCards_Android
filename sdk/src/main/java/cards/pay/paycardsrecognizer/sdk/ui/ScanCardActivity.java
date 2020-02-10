@@ -17,8 +17,7 @@ import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionCoreUtils;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
 
-public class ScanCardActivity extends AppCompatActivity implements ScanCardFragment.InteractionListener,
-        InitLibraryFragment.InteractionListener {
+public class ScanCardActivity extends AppCompatActivity implements InteractionListener {
 
     private static final String TAG = "ScanCardActivity";
 
@@ -76,7 +75,7 @@ public class ScanCardActivity extends AppCompatActivity implements ScanCardFragm
 
     @Override
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public void onScanCardFinished(Card card, @Nullable byte cardImage[]) {
+    public void onScanCardFinished(Card card, @Nullable byte[] cardImage) {
         Intent intent = new Intent();
         intent.putExtra(ScanCardIntent.RESULT_PAYCARDS_CARD, (Parcelable) card);
         if (cardImage != null) intent.putExtra(ScanCardIntent.RESULT_CARD_IMAGE, cardImage);
