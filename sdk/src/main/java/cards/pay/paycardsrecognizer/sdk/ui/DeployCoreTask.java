@@ -4,9 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.view.View;
-
-import java.lang.ref.WeakReference;
 
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionCoreUtils;
@@ -15,19 +12,24 @@ import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionCore;
 
 public class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
 
-    private final WeakReference<InitLibraryFragment> fragmentRef;
-
+    private final DeployCoreTaskCallback callback;
     @SuppressLint("StaticFieldLeak")
     private final Context appContext;
 
-    DeployCoreTask(InitLibraryFragment parent) {
-        this.fragmentRef = new WeakReference<>(parent);
-        this.appContext = parent.getContext().getApplicationContext();
+    DeployCoreTask(Context context, DeployCoreTaskCallback callback) {
+        this.callback = callback;
+
+        appContext = context == null
+                ? null
+                : context.getApplicationContext();
     }
 
     @Override
     protected Throwable doInBackground(Void... voids) {
         try {
+            if (callback == null) {
+                throw new RecognitionUnavailableException();
+            }
             RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(appContext);
             if (checkResult.isFailed()) {
                 throw new RecognitionUnavailableException();
@@ -45,16 +47,10 @@ public class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
     @Override
     protected void onPostExecute(@Nullable Throwable lastError) {
         super.onPostExecute(lastError);
-        InitLibraryFragment fragment = fragmentRef.get();
-        if (fragment == null
-                || fragment.mProgressBar == null
-                || fragment.mListener == null) return;
+        final DeployCoreTaskResult deployCoreTaskResult = lastError == null
+                ? new DeployCoreTaskResult()
+                : new DeployCoreTaskResult(lastError);
 
-        fragment.mProgressBar.setVisibility(View.GONE);
-        if (lastError == null) {
-            fragment.mListener.onInitLibraryComplete();
-        } else {
-            fragment.mListener.onInitLibraryFailed(lastError);
-        }
+        callback.onResult(deployCoreTaskResult);
     }
 }

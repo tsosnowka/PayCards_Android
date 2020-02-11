@@ -20,6 +20,17 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
 
     public DeployCoreTask mDeployCoreTask;
 
+    private DeployCoreTaskCallback deployCoreTaskCallback = new DeployCoreTaskCallback() {
+        @Override
+        public void onResult(DeployCoreTaskResult result) {
+            if (result.getResult() == DeployCoreTaskResult.SUCCESS) {
+                mListener.onInitLibraryComplete();
+            } else {
+                mListener.onInitLibraryFailed(result.getThrowable());
+            }
+        }
+    };
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -68,7 +79,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
         if (mDeployCoreTask != null) {
             mDeployCoreTask.cancel(false);
         }
-        mDeployCoreTask = new DeployCoreTask(this);
+        mDeployCoreTask = new DeployCoreTask(getContext(), deployCoreTaskCallback);
         mDeployCoreTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
