@@ -4,19 +4,21 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionCoreUtils;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
 import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionCore;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
 
     private final DeployCoreTaskCallback callback;
     @SuppressLint("StaticFieldLeak")
     private final Context appContext;
 
-    DeployCoreTask(Context context, DeployCoreTaskCallback callback) {
+    DeployCoreTask(final Context context, final DeployCoreTaskCallback callback) {
         this.callback = callback;
 
         appContext = context == null
@@ -30,7 +32,7 @@ public class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
             if (callback == null) {
                 throw new RecognitionUnavailableException();
             }
-            RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(appContext);
+            final RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(appContext);
             if (checkResult.isFailed()) {
                 throw new RecognitionUnavailableException();
             }

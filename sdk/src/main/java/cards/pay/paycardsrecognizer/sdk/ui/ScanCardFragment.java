@@ -1,6 +1,5 @@
 package cards.pay.paycardsrecognizer.sdk.ui;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -10,7 +9,6 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
@@ -34,26 +32,28 @@ public class ScanCardFragment extends BaseScanCardFragment {
     @SuppressWarnings("unused")
     public static final String TAG = "ScanCardFragment";
 
-    public static ScanCardFragment getInstance(ScanCardRequest scanCardRequest) {
-        ScanCardFragment fragment = new ScanCardFragment();
-        Bundle args = new Bundle(1);
+    public static ScanCardFragment getInstance(final ScanCardRequest scanCardRequest) {
+        final ScanCardFragment fragment = new ScanCardFragment();
+
+        final Bundle args = new Bundle(1);
         args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
         fragment.setArguments(args);
+
         return fragment;
     }
 
     public static void start(
-            FragmentActivity activity,
-            ScanCardRequest scanCardRequest,
-            InteractionListener listener
+            final FragmentActivity activity,
+            final ScanCardRequest scanCardRequest,
+            final InteractionListener listener,
+            int containerResId
     ) {
-        Fragment fragment = ScanCardFragment.getInstance(scanCardRequest);
-        if (activity == null) {
-            listener.onInitLibraryFailed(new Throwable());
-            return;
-        }
+        final ScanCardFragment fragment = ScanCardFragment.getInstance(scanCardRequest);
+        fragment.interactionListener = listener;
+        fragment.containerResId = containerResId;
+
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, fragment, ScanCardFragment.TAG)
+                .replace(containerResId, fragment, ScanCardFragment.TAG)
                 .setCustomAnimations(0, 0)
                 .commitNow();
 
@@ -66,17 +66,6 @@ public class ScanCardFragment extends BaseScanCardFragment {
     private SoundPool mSoundPool;
 
     private int mCapturedSoundId = -1;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (InteractionListener) getActivity();
-        } catch (ClassCastException ex) {
-            throw new RuntimeException("Parent must implement " + InteractionListener.class.getSimpleName());
-        }
-    }
-
 
     @Override
     void onToggleFlashButtonClick() {
@@ -107,7 +96,7 @@ public class ScanCardFragment extends BaseScanCardFragment {
 
             @Override
             public void onCameraOpened(Camera.Parameters cameraParameters) {
-                boolean isFlashSupported = (cameraParameters.getSupportedFlashModes() != null
+                final boolean isFlashSupported = (cameraParameters.getSupportedFlashModes() != null
                         && !cameraParameters.getSupportedFlashModes().isEmpty());
                 if (getView() == null) {
                     return;
@@ -137,14 +126,14 @@ public class ScanCardFragment extends BaseScanCardFragment {
                     playCaptureSound();
                 }
                 if (result.isFinal()) {
-                    String date;
+                    final String date;
                     if (TextUtils.isEmpty(result.getDate())) {
                         date = null;
                     } else {
                         date = result.getDate().substring(0, 2) + '/' + result.getDate().substring(2);
                     }
 
-                    Card card = new Card(result.getNumber(), result.getName(), date);
+                    final Card card = new Card(result.getNumber(), result.getName(), date);
                     byte[] cardImage = mLastCardImage;
                     mLastCardImage = null;
                     finishWithResult(card, cardImage);
@@ -171,7 +160,7 @@ public class ScanCardFragment extends BaseScanCardFragment {
             @Nullable
             private byte[] compressCardImage(Bitmap img) {
                 byte[] result;
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                final ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 if (img.compress(Bitmap.CompressFormat.JPEG, 80, stream)) {
                     result = stream.toByteArray();
                 } else {
@@ -216,14 +205,14 @@ public class ScanCardFragment extends BaseScanCardFragment {
     }
 
     private void finishWithError(Exception exception) {
-        if (mListener != null) {
-            mListener.onScanCardFailed(exception);
+        if (interactionListener != null) {
+            interactionListener.onScanCardFailed(exception);
         }
     }
 
     private void finishWithResult(Card card, @Nullable byte[] cardImage) {
-        if (mListener != null) {
-            mListener.onScanCardFinished(card, cardImage);
+        if (interactionListener != null) {
+            interactionListener.onScanCardFinished(card, cardImage);
         }
     }
 

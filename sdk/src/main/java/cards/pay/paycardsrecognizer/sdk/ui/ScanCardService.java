@@ -3,7 +3,6 @@ package cards.pay.paycardsrecognizer.sdk.ui;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
@@ -18,13 +17,22 @@ public class ScanCardService implements InteractionListener {
     private static final String TAG = "ScanCardService";
     private final AppCompatActivity activity;
     private final ScanCardRequest scanCardRequest;
+    private final InteractionListener interactionListener;
+    private final int containerResId;//android.R.id.content
 
-    public ScanCardService(AppCompatActivity activity, ScanCardRequest scanCardRequest) {
+    public ScanCardService(
+            AppCompatActivity activity,
+            ScanCardRequest scanCardRequest,
+            InteractionListener interactionListener,
+            int containerResId
+    ) {
         this.activity = activity;
         this.scanCardRequest = scanCardRequest;
+        this.interactionListener = interactionListener;
+        this.containerResId = containerResId;
     }
 
-    protected void onCreate() {
+    public void initLib() {
         activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(activity);
@@ -34,19 +42,11 @@ public class ScanCardService implements InteractionListener {
         } else {
             if (RecognitionCoreUtils.isRecognitionCoreDeployRequired(activity)
                     || checkResult.isFailedOnCameraPermission()) {
-                showInitLibrary();
+                InitLibraryFragment.start(activity, scanCardRequest, interactionListener, containerResId);
             } else {
-                ScanCardFragment.start(activity, scanCardRequest, this);
+                ScanCardFragment.start(activity, scanCardRequest, interactionListener, containerResId);
             }
         }
-    }
-
-    private void showInitLibrary() {
-        Fragment fragment = new InitLibraryFragment();
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, fragment, InitLibraryFragment.TAG)
-                .setCustomAnimations(0, 0)
-                .commitNow();
     }
 
     @Override

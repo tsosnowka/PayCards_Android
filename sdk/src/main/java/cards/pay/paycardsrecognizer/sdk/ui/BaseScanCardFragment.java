@@ -2,6 +2,7 @@ package cards.pay.paycardsrecognizer.sdk.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import cards.pay.paycardsrecognizer.sdk.camera.widget.CameraPreviewLayout;
 import cards.pay.paycardsrecognizer.sdk.ui.views.ProgressBarIndeterminate;
 import cards.pay.paycardsrecognizer.sdk.utils.Constants;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public abstract class BaseScanCardFragment extends Fragment implements BaseScanCardInterface {
 
     public static final String TAG = "BaseScanCardFragment";
@@ -24,8 +26,10 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     public ViewGroup mMainContent;
     public View mFlashButton;
     public View enterManuallyButton;
-    protected InteractionListener mListener;
+
+    protected int containerResId;
     protected ScanCardRequest scanCardRequest;
+    protected InteractionListener interactionListener;
 
     abstract void onToggleFlashButtonClick();
 
@@ -55,8 +59,8 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
         enterManuallyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null)
-                    mListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
+                if (interactionListener != null)
+                    interactionListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
             }
         });
 

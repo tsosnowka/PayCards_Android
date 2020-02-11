@@ -3,10 +3,12 @@ package cards.pay.paycardsrecognizer.sdk.ui;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.support.annotation.RestrictTo;
 
 import cards.pay.paycardsrecognizer.sdk.R;
 import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionResult;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class PlayCaptureSoundImpl implements PlayCaptureSound {
     public static final boolean isSoundEnabled = false;
     private int mCapturedSoundId = -1;

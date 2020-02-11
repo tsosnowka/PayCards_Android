@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
@@ -26,43 +25,53 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             if (result.getResult() == DeployCoreTaskResult.SUCCESS) {
                 final FragmentActivity activity = getActivity();
                 if (activity == null || activity.isFinishing()) {
-                    mListener.onInitLibraryFailed(new Throwable());
+                    interactionListener.onInitLibraryFailed(new Throwable());
                     return;
                 }
-                ScanCardFragment.start(activity, scanCardRequest, mListener);
+                ScanCardFragment.start(activity, scanCardRequest, interactionListener, containerResId);
             } else {
-                mListener.onInitLibraryFailed(result.getThrowable());
+                interactionListener.onInitLibraryFailed(result.getThrowable());
             }
         }
     };
 
     public static InitLibraryFragment getInstance(ScanCardRequest scanCardRequest) {
-        InitLibraryFragment fragment = new InitLibraryFragment();
-        Bundle args = new Bundle(1);
+        final InitLibraryFragment fragment = new InitLibraryFragment();
+
+        final Bundle args = new Bundle(1);
         args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
         fragment.setArguments(args);
+
         return fragment;
     }
 
     public DeployCoreTask mDeployCoreTask;
 
-    public static void start(FragmentActivity activity, ScanCardRequest scanCardRequest) {
-        Fragment fragment = InitLibraryFragment.getInstance(scanCardRequest);
+    public static void start(
+            FragmentActivity activity,
+            ScanCardRequest scanCardRequest,
+            final InteractionListener interactionListener,
+            int containerResId
+    ) {
+        final InitLibraryFragment fragment = InitLibraryFragment.getInstance(scanCardRequest);
+        fragment.interactionListener = interactionListener;
+        fragment.containerResId = containerResId;
+
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, fragment, InitLibraryFragment.TAG)
+                .replace(containerResId, fragment, InitLibraryFragment.TAG)
                 .setCustomAnimations(0, 0)
                 .commitNow();
     }
 
     @Override
     void onToggleFlashButtonClick() {
-
+        //no-op
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(getContext());
+        final RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(getContext());
         if (checkResult.isFailedOnCameraPermission()) {
             if (savedInstanceState == null) {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
@@ -79,8 +88,8 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 subscribeToInitCore();
             } else {
-                if (mListener != null) {
-                    mListener.onInitLibraryFailed(new RecognitionUnavailableException(
+                if (interactionListener != null) {
+                    interactionListener.onInitLibraryFailed(new RecognitionUnavailableException(
                             RecognitionUnavailableException.ERROR_NO_CAMERA_PERMISSION));
                 }
             }
@@ -108,7 +117,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        interactionListener = null;
     }
 
 }
