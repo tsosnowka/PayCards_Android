@@ -1,4 +1,4 @@
-package cards.pay.paycardsrecognizer.sdk.ui;
+package cards.pay.paycardsrecognizer.sdk.core.service;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
 

@@ -1,4 +1,4 @@
-package cards.pay.paycardsrecognizer.sdk.ui;
+package cards.pay.paycardsrecognizer.sdk.core.base;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +12,8 @@ import android.view.animation.Animation;
 
 import cards.pay.paycardsrecognizer.sdk.R;
 import cards.pay.paycardsrecognizer.sdk.camera.widget.CameraPreviewLayout;
+import cards.pay.paycardsrecognizer.sdk.core.service.InteractionListener;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
 import cards.pay.paycardsrecognizer.sdk.ui.views.ProgressBarIndeterminate;
 import cards.pay.paycardsrecognizer.sdk.utils.Constants;
 
@@ -29,7 +31,7 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     protected ScanCardRequest scanCardRequest;
     protected InteractionListener interactionListener;
 
-    abstract void onToggleFlashButtonClick();
+    protected abstract void onToggleFlashButtonClick();
 
     @Nullable
     @Override
@@ -46,6 +48,8 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
                 onToggleFlashButtonClick();
             }
         });
+
+        showMainContent();
 
         return root;
     }
@@ -69,17 +73,13 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     }
 
     @Override
-    public void onShowProgress() {
-        if (mProgressBar != null) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
+    public void showProgress() {
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onHideProgress() {
-        if (mProgressBar != null) {
-            mProgressBar.setVisibility(View.GONE);
-        }
+    public void hideProgress() {
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override

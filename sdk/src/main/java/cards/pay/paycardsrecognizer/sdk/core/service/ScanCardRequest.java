@@ -1,4 +1,4 @@
-package cards.pay.paycardsrecognizer.sdk.ui;
+package cards.pay.paycardsrecognizer.sdk.core.service;
 
 import android.os.Parcel;
 import android.os.Parcelable;

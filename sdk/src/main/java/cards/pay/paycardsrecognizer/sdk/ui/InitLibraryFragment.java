@@ -10,6 +10,12 @@ import android.support.v4.app.FragmentActivity;
 
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
+import cards.pay.paycardsrecognizer.sdk.core.base.BaseScanCardFragment;
+import cards.pay.paycardsrecognizer.sdk.core.service.InteractionListener;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
+import cards.pay.paycardsrecognizer.sdk.core.task.DeployCoreTask;
+import cards.pay.paycardsrecognizer.sdk.core.task.DeployCoreTaskCallback;
+import cards.pay.paycardsrecognizer.sdk.core.task.DeployCoreTaskResult;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class InitLibraryFragment extends BaseScanCardFragment {
@@ -21,6 +27,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     private DeployCoreTaskCallback deployCoreTaskCallback = new DeployCoreTaskCallback() {
         @Override
         public void onResult(DeployCoreTaskResult result) {
+            hideProgress();
             if (result.getResult() == DeployCoreTaskResult.SUCCESS) {
                 final FragmentActivity activity = getActivity();
                 if (activity == null || activity.isFinishing()) {
@@ -54,7 +61,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     }
 
     @Override
-    void onToggleFlashButtonClick() {
+    protected void onToggleFlashButtonClick() {
         //no-op
     }
 
@@ -87,7 +94,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     }
 
     private void subscribeToInitCore() {
-        onShowProgress();
+        showProgress();
         if (mDeployCoreTask != null) {
             mDeployCoreTask.cancel(false);
         }

@@ -19,6 +19,9 @@ import java.io.ByteArrayOutputStream;
 import cards.pay.paycardsrecognizer.sdk.Card;
 import cards.pay.paycardsrecognizer.sdk.R;
 import cards.pay.paycardsrecognizer.sdk.camera.ScanManager;
+import cards.pay.paycardsrecognizer.sdk.core.base.BaseScanCardFragment;
+import cards.pay.paycardsrecognizer.sdk.core.service.InteractionListener;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
 import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionResult;
 
 import static cards.pay.paycardsrecognizer.sdk.ndk.RecognitionConstants.RECOGNIZER_MODE_DATE;
@@ -58,7 +61,7 @@ public class ScanCardFragment extends BaseScanCardFragment {
     private int mCapturedSoundId = -1;
 
     @Override
-    void onToggleFlashButtonClick() {
+    protected void onToggleFlashButtonClick() {
         if (mScanManager != null) {
             mScanManager.toggleFlash();
         }

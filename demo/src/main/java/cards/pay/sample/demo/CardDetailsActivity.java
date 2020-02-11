@@ -19,7 +19,7 @@ import android.widget.EditText;
 import java.lang.reflect.Method;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
-import cards.pay.paycardsrecognizer.sdk.ui.ScanCardRequest;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
 import cards.pay.sample.demo.validation.CardExpiryDateValidator;
 import cards.pay.sample.demo.validation.CardHolderValidator;
 import cards.pay.sample.demo.validation.CardNumberValidator;

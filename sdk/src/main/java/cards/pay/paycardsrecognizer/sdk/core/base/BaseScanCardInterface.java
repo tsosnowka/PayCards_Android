@@ -1,12 +1,12 @@
-package cards.pay.paycardsrecognizer.sdk.ui;
+package cards.pay.paycardsrecognizer.sdk.core.base;
 
 import android.support.annotation.RestrictTo;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public interface BaseScanCardInterface {
-    void onShowProgress();
+    void showProgress();
 
-    void onHideProgress();
+    void hideProgress();
 
     void showMainContent();
 

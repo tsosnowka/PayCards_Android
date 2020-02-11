@@ -49,10 +49,15 @@ afterEvaluate { project ->
                 pom.artifactId = POM_ARTIFACT_ID
                 pom.version = VERSION_NAME
 
-                repository(url: getReleaseRepositoryUrl()) {
+                //check if user name and password is specified and push to repo, otherwise to mavenLocal
+                boolean isRemoteRepository = (getRepositoryUsername().length() != 0 && getRepositoryPassword().length() != 0)
+                def mavenUrl = isRemoteRepository ? getReleaseRepositoryUrl() : mavenLocal().url
+                def mavenSnapshotUrl = isRemoteRepository ? getSnapshotRepositoryUrl() : mavenLocal().url
+
+                repository(url: mavenUrl) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                snapshotRepository(url: mavenSnapshotUrl) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
 

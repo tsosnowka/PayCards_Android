@@ -1,4 +1,4 @@
-package cards.pay.paycardsrecognizer.sdk.ui;
+package cards.pay.paycardsrecognizer.sdk.core.task;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,7 +18,7 @@ public class DeployCoreTask extends AsyncTask<Void, Void, Throwable> {
     @SuppressLint("StaticFieldLeak")
     private final Context appContext;
 
-    DeployCoreTask(final Context context, final DeployCoreTaskCallback callback) {
+    public DeployCoreTask(final Context context, final DeployCoreTaskCallback callback) {
         this.callback = callback;
 
         appContext = context == null

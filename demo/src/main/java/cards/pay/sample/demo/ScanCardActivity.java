@@ -15,9 +15,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
-import cards.pay.paycardsrecognizer.sdk.ui.InteractionListener;
-import cards.pay.paycardsrecognizer.sdk.ui.ScanCardRequest;
-import cards.pay.paycardsrecognizer.sdk.ui.ScanCardService;
+import cards.pay.paycardsrecognizer.sdk.core.service.InteractionListener;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardService;
+import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardServiceImpl;
 
 public class ScanCardActivity extends AppCompatActivity implements InteractionListener {
 
@@ -30,7 +31,7 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static final String KEY_SCAN_CARD_REQUEST = "cards.pay.paycardsrecognizer.sdk.ui.ScanCardActivity.SCAN_CARD_REQUEST";
     private static final String TAG = "ScanCardActivity";
-    private final ScanCardService scanCardService = new ScanCardService(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
+    private final ScanCardService scanCardService = new ScanCardServiceImpl(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
     private View enterManuallyButton;
 
     @Override
@@ -45,7 +46,7 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
             }
         });
 
-        scanCardService.initLib();
+        scanCardService.initScanCardLib();
     }
 
     @Override
