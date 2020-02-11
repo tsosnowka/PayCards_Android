@@ -98,13 +98,6 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
         finish();
     }
 
-    @Override
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public void onInitLibraryComplete() {
-        if (isFinishing()) return;
-        showScanCard();
-    }
-
     private ScanCardRequest getScanRequest() {
         ScanCardRequest request = getIntent().getParcelableExtra(ScanCardIntent.KEY_SCAN_CARD_REQUEST);
         if (request == null) {

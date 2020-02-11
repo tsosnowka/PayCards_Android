@@ -10,6 +10,9 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -31,15 +34,38 @@ public class ScanCardFragment extends BaseScanCardFragment {
     @SuppressWarnings("unused")
     public static final String TAG = "ScanCardFragment";
 
+    public static ScanCardFragment getInstance(ScanCardRequest scanCardRequest) {
+        ScanCardFragment fragment = new ScanCardFragment();
+        Bundle args = new Bundle(1);
+        args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static void start(
+            FragmentActivity activity,
+            ScanCardRequest scanCardRequest,
+            InteractionListener listener
+    ) {
+        Fragment fragment = ScanCardFragment.getInstance(scanCardRequest);
+        if (activity == null) {
+            listener.onInitLibraryFailed(new Throwable());
+            return;
+        }
+        activity.getSupportFragmentManager().beginTransaction()
+                .replace(android.R.id.content, fragment, ScanCardFragment.TAG)
+                .setCustomAnimations(0, 0)
+                .commitNow();
+
+        ViewCompat.requestApplyInsets(activity.findViewById(android.R.id.content));
+    }
+
     @Nullable
     private ScanManager mScanManager;
 
     private SoundPool mSoundPool;
 
     private int mCapturedSoundId = -1;
-
-
-    private ScanCardRequest mRequest;
 
     @Override
     public void onAttach(Context context) {
@@ -51,17 +77,6 @@ public class ScanCardFragment extends BaseScanCardFragment {
         }
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mRequest = null;
-        if (getArguments() != null) {
-            mRequest = getArguments().getParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST);
-        }
-        if (mRequest == null) {
-            mRequest = ScanCardRequest.getDefault();
-        }
-    }
 
     @Override
     void onToggleFlashButtonClick() {
@@ -81,9 +96,10 @@ public class ScanCardFragment extends BaseScanCardFragment {
         }
 
         int recognitionMode = RECOGNIZER_MODE_NUMBER;
-        if (mRequest.isScanCardHolderEnabled()) recognitionMode |= RECOGNIZER_MODE_NAME;
-        if (mRequest.isScanExpirationDateEnabled()) recognitionMode |= RECOGNIZER_MODE_DATE;
-        if (mRequest.isGrabCardImageEnabled()) recognitionMode |= RECOGNIZER_MODE_GRAB_CARD_IMAGE;
+        if (scanCardRequest.isScanCardHolderEnabled()) recognitionMode |= RECOGNIZER_MODE_NAME;
+        if (scanCardRequest.isScanExpirationDateEnabled()) recognitionMode |= RECOGNIZER_MODE_DATE;
+        if (scanCardRequest.isGrabCardImageEnabled())
+            recognitionMode |= RECOGNIZER_MODE_GRAB_CARD_IMAGE;
 
         mScanManager = new ScanManager(recognitionMode, getActivity(), mCameraPreviewLayout, new ScanManager.Callbacks() {
 
@@ -193,7 +209,7 @@ public class ScanCardFragment extends BaseScanCardFragment {
     }
 
     private void innitSoundPool() {
-        if (mRequest.isSoundEnabled()) {
+        if (scanCardRequest.isSoundEnabled()) {
             mSoundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
             mCapturedSoundId = mSoundPool.load(getActivity(), R.raw.wocr_capture_card, 0);
         }

@@ -1,13 +1,15 @@
 package cards.pay.paycardsrecognizer.sdk.ui;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
+import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
 
@@ -18,27 +20,38 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
 
     public static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
 
-    public DeployCoreTask mDeployCoreTask;
-
     private DeployCoreTaskCallback deployCoreTaskCallback = new DeployCoreTaskCallback() {
         @Override
         public void onResult(DeployCoreTaskResult result) {
             if (result.getResult() == DeployCoreTaskResult.SUCCESS) {
-                mListener.onInitLibraryComplete();
+                final FragmentActivity activity = getActivity();
+                if (activity == null || activity.isFinishing()) {
+                    mListener.onInitLibraryFailed(new Throwable());
+                    return;
+                }
+                ScanCardFragment.start(activity, scanCardRequest, mListener);
             } else {
                 mListener.onInitLibraryFailed(result.getThrowable());
             }
         }
     };
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (InteractionListener) getActivity();
-        } catch (ClassCastException ex) {
-            throw new RuntimeException("Parent must implement " + InteractionListener.class.getSimpleName());
-        }
+    public static InitLibraryFragment getInstance(ScanCardRequest scanCardRequest) {
+        InitLibraryFragment fragment = new InitLibraryFragment();
+        Bundle args = new Bundle(1);
+        args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public DeployCoreTask mDeployCoreTask;
+
+    public static void start(FragmentActivity activity, ScanCardRequest scanCardRequest) {
+        Fragment fragment = InitLibraryFragment.getInstance(scanCardRequest);
+        activity.getSupportFragmentManager().beginTransaction()
+                .replace(android.R.id.content, fragment, InitLibraryFragment.TAG)
+                .setCustomAnimations(0, 0)
+                .commitNow();
     }
 
     @Override

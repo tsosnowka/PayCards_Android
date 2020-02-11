@@ -8,8 +8,6 @@ public interface InteractionListener {
 
     void onInitLibraryFailed(Throwable e);
 
-    void onInitLibraryComplete();
-
     void onScanCardFailed(Exception e);
 
     void onScanCardFinished(Card card, byte[] cardImage);

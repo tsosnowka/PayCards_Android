@@ -24,9 +24,16 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     public ViewGroup mMainContent;
     public View mFlashButton;
     public View enterManuallyButton;
-    public InteractionListener mListener;
+    protected InteractionListener mListener;
+    protected ScanCardRequest scanCardRequest;
 
     abstract void onToggleFlashButtonClick();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initScanCardRequestFromBundle();
+    }
 
     @Nullable
     @Override
@@ -52,6 +59,7 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
                     mListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
             }
         });
+
         return root;
     }
 
@@ -97,6 +105,16 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     public void hideMainContent() {
         mMainContent.setVisibility(View.INVISIBLE);
         mCameraPreviewLayout.setVisibility(View.INVISIBLE);
+    }
+
+    private void initScanCardRequestFromBundle() {
+        scanCardRequest = null;
+        if (getArguments() != null) {
+            scanCardRequest = getArguments().getParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST);
+        }
+        if (scanCardRequest == null) {
+            scanCardRequest = ScanCardRequest.getDefault();
+        }
     }
 
 }
