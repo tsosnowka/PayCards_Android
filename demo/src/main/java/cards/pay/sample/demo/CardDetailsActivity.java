@@ -19,8 +19,7 @@ import android.widget.EditText;
 import java.lang.reflect.Method;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent.CancelReason;
+import cards.pay.paycardsrecognizer.sdk.ui.ScanCardRequest;
 import cards.pay.sample.demo.validation.CardExpiryDateValidator;
 import cards.pay.sample.demo.validation.CardHolderValidator;
 import cards.pay.sample.demo.validation.CardNumberValidator;
@@ -92,28 +91,28 @@ public class CardDetailsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_SCAN_CARD) {
             if (resultCode == Activity.RESULT_OK) {
-                Card card = data.getParcelableExtra(ScanCardIntent.RESULT_PAYCARDS_CARD);
+                Card card = data.getParcelableExtra(ScanCardActivity.RESULT_PAYCARDS_CARD);
                 if (BuildConfig.DEBUG) Log.i(TAG, "Card info: " + card);
                 setCard(card);
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                @CancelReason final int reason;
+                @ScanCardActivity.CancelReason final int reason;
                 if (data != null) {
-                    reason = data.getIntExtra(ScanCardIntent.RESULT_CANCEL_REASON, ScanCardIntent.BACK_PRESSED);
+                    reason = data.getIntExtra(ScanCardActivity.RESULT_CANCEL_REASON, ScanCardActivity.BACK_PRESSED);
                 } else {
-                    reason = ScanCardIntent.BACK_PRESSED;
+                    reason = ScanCardActivity.BACK_PRESSED;
                 }
 
-                if (reason == ScanCardIntent.ADD_MANUALLY_PRESSED) {
+                if (reason == ScanCardActivity.ADD_MANUALLY_PRESSED) {
                     showIme(mCardNumberField.getEditText());
                 }
-            } else if (resultCode == ScanCardIntent.RESULT_CODE_ERROR) {
+            } else if (resultCode == ScanCardActivity.RESULT_CODE_ERROR) {
                 Log.i(TAG, "Scan failed");
             }
         }
     }
 
     private Card readForm() {
-        String cardNumber = ((CardNumberEditText)mCardNumberField.getEditText()).getCardNumber();
+        String cardNumber = ((CardNumberEditText) mCardNumberField.getEditText()).getCardNumber();
         String holder = mCardholderField.getEditText().getText().toString();
         String expiryDate = mExpiryField.getEditText().getText().toString();
         return new Card(cardNumber, holder, expiryDate);
@@ -153,7 +152,10 @@ public class CardDetailsActivity extends AppCompatActivity {
     }
 
     private void scanCard() {
-        Intent intent = new ScanCardIntent.Builder(this).build();
+        Intent intent = new Intent(this, ScanCardActivity.class);
+        ScanCardRequest request = new ScanCardRequest(true, true,
+                true, true);
+        intent.putExtra(ScanCardActivity.KEY_SCAN_CARD_REQUEST, request);
         startActivityForResult(intent, REQUEST_CODE_SCAN_CARD);
     }
 

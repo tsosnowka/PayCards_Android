@@ -14,11 +14,7 @@
         android:glEsVersion="0x00020000"
         android:required="true" />
 
-    <application>
-        <activity
-            android:name="cards.pay.paycardsrecognizer.sdk.ui.ScanCardActivity"
-            android:theme="@style/wocr_RecognizerTheme" />
-    </application>
+    <application></application>
 
 
 </manifest>

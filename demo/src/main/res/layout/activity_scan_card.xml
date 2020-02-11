@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/scan_card_service_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="50dp" />
+
+    <cards.pay.paycardsrecognizer.sdk.ui.views.ButtonWithTopBorder
+        android:id="@+id/wocr_tv_enter_card_number_id"
+        style="@style/wocr_EnterManuallyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:includeFontPadding="false"
+        android:text="@string/wocr_button_enter_card_number" />
+</LinearLayout>

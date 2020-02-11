@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 
 import cards.pay.paycardsrecognizer.sdk.R;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.widget.CameraPreviewLayout;
 import cards.pay.paycardsrecognizer.sdk.ui.views.ProgressBarIndeterminate;
 import cards.pay.paycardsrecognizer.sdk.utils.Constants;
@@ -25,19 +24,12 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     public CameraPreviewLayout mCameraPreviewLayout;
     public ViewGroup mMainContent;
     public View mFlashButton;
-    public View enterManuallyButton;
 
     protected int containerResId;
     protected ScanCardRequest scanCardRequest;
     protected InteractionListener interactionListener;
 
     abstract void onToggleFlashButtonClick();
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initScanCardRequestFromBundle();
-    }
 
     @Nullable
     @Override
@@ -52,15 +44,6 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
             @Override
             public void onClick(final View v) {
                 onToggleFlashButtonClick();
-            }
-        });
-
-        enterManuallyButton = root.findViewById(R.id.wocr_tv_enter_card_number_id);
-        enterManuallyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (interactionListener != null)
-                    interactionListener.onScanCardCanceled(ScanCardIntent.ADD_MANUALLY_PRESSED);
             }
         });
 
@@ -109,16 +92,6 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     public void hideMainContent() {
         mMainContent.setVisibility(View.INVISIBLE);
         mCameraPreviewLayout.setVisibility(View.INVISIBLE);
-    }
-
-    private void initScanCardRequestFromBundle() {
-        scanCardRequest = null;
-        if (getArguments() != null) {
-            scanCardRequest = getArguments().getParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST);
-        }
-        if (scanCardRequest == null) {
-            scanCardRequest = ScanCardRequest.getDefault();
-        }
     }
 
 }

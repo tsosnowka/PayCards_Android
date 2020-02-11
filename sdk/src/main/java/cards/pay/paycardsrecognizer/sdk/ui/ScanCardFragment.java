@@ -18,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
 import cards.pay.paycardsrecognizer.sdk.R;
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.ScanManager;
 import cards.pay.paycardsrecognizer.sdk.ndk.RecognitionResult;
 
@@ -32,25 +31,16 @@ public class ScanCardFragment extends BaseScanCardFragment {
     @SuppressWarnings("unused")
     public static final String TAG = "ScanCardFragment";
 
-    public static ScanCardFragment getInstance(final ScanCardRequest scanCardRequest) {
-        final ScanCardFragment fragment = new ScanCardFragment();
-
-        final Bundle args = new Bundle(1);
-        args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     public static void start(
             final FragmentActivity activity,
             final ScanCardRequest scanCardRequest,
             final InteractionListener listener,
             int containerResId
     ) {
-        final ScanCardFragment fragment = ScanCardFragment.getInstance(scanCardRequest);
+        final ScanCardFragment fragment = new ScanCardFragment();
         fragment.interactionListener = listener;
         fragment.containerResId = containerResId;
+        fragment.scanCardRequest = scanCardRequest;
 
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, ScanCardFragment.TAG)

@@ -36,5 +36,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".IntroActivity" />
         </activity>
+        <activity
+            android:name=".ScanCardActivity"
+            tools:ignore="UnusedAttribute" />
     </application>
 </manifest>

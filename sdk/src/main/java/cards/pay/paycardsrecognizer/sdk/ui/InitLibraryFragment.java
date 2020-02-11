@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.FragmentActivity;
 
-import cards.pay.paycardsrecognizer.sdk.ScanCardIntent;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
 
@@ -35,16 +34,6 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
         }
     };
 
-    public static InitLibraryFragment getInstance(ScanCardRequest scanCardRequest) {
-        final InitLibraryFragment fragment = new InitLibraryFragment();
-
-        final Bundle args = new Bundle(1);
-        args.putParcelable(ScanCardIntent.KEY_SCAN_CARD_REQUEST, scanCardRequest);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
-
     public DeployCoreTask mDeployCoreTask;
 
     public static void start(
@@ -53,9 +42,10 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             final InteractionListener interactionListener,
             int containerResId
     ) {
-        final InitLibraryFragment fragment = InitLibraryFragment.getInstance(scanCardRequest);
+        final InitLibraryFragment fragment = new InitLibraryFragment();
         fragment.interactionListener = interactionListener;
         fragment.containerResId = containerResId;
+        fragment.scanCardRequest = scanCardRequest;
 
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, InitLibraryFragment.TAG)
