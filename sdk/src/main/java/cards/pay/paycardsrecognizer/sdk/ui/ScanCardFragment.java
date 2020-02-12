@@ -48,7 +48,8 @@ public class ScanCardFragment extends BaseScanCardFragment {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, ScanCardFragment.TAG)
                 .setCustomAnimations(0, 0)
-                .commitNow();
+                .disallowAddToBackStack()
+                .commit();
 
         ViewCompat.requestApplyInsets(activity.findViewById(android.R.id.content));
     }

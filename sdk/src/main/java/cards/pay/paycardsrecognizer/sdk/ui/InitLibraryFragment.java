@@ -57,7 +57,8 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, InitLibraryFragment.TAG)
                 .setCustomAnimations(0, 0)
-                .commitNow();
+                .disallowAddToBackStack()
+                .commit();
     }
 
     @Override

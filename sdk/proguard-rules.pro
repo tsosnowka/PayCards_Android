@@ -28,6 +28,7 @@
 -dontobfuscate
 
 -keep class cards.pay.paycardsrecognizer.sdk.ndk.RecognitionCore { *; }
+-keep class cards.pay.paycardsrecognizer.sdk.core.service.* { *; }
 -dontnote cards.pay.paycardsrecognizer.sdk.ndk.RecognitionCore
 
 -keep class cards.pay.paycardsrecognizer.sdk.* {

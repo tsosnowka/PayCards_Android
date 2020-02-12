@@ -1,5 +1,6 @@
 package cards.pay.paycardsrecognizer.sdk.core.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -32,6 +33,15 @@ public abstract class BaseScanCardFragment extends Fragment implements BaseScanC
     protected InteractionListener interactionListener;
 
     protected abstract void onToggleFlashButtonClick();
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (interactionListener == null) {
+            throw new RuntimeException("InteractionListener not attached to : " + BaseScanCardFragment.class.getName());
+        }
+    }
 
     @Nullable
     @Override

@@ -10,25 +10,14 @@ import cards.pay.paycardsrecognizer.sdk.ui.InitLibraryFragment;
 import cards.pay.paycardsrecognizer.sdk.ui.ScanCardFragment;
 
 public class ScanCardServiceImpl implements ScanCardService {
-    private final AppCompatActivity activity;
-    private final ScanCardRequest scanCardRequest;
-    private final InteractionListener interactionListener;
-    private final int containerResId;
 
-    public ScanCardServiceImpl(
+    @Override
+    public void initScanCardLib(
             AppCompatActivity activity,
             ScanCardRequest scanCardRequest,
             InteractionListener interactionListener,
             int containerResId
     ) {
-        this.activity = activity;
-        this.scanCardRequest = scanCardRequest;
-        this.interactionListener = interactionListener;
-        this.containerResId = containerResId;
-    }
-
-    @Override
-    public void initScanCardLib() {
         activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(activity);
