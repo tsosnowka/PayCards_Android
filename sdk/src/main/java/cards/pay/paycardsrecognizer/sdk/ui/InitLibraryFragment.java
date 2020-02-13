@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
@@ -35,6 +36,8 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
                     return;
                 }
                 ScanCardFragment.start(activity, scanCardRequest, interactionListener, containerResId);
+                activity.getSupportFragmentManager()
+                        .popBackStackImmediate(TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             } else {
                 interactionListener.onInitLibraryFailed(result.getThrowable());
             }
