@@ -9,6 +9,7 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
@@ -48,8 +49,31 @@ public class ScanCardFragment extends BaseScanCardFragment {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, ScanCardFragment.TAG)
                 .setCustomAnimations(0, 0)
-                .disallowAddToBackStack()
                 .commit();
+
+        ViewCompat.requestApplyInsets(activity.findViewById(android.R.id.content));
+    }
+
+    public static void start(
+            final Fragment fragment,
+            final ScanCardRequest scanCardRequest,
+            final InteractionListener listener,
+            int containerResId
+    ) {
+        final ScanCardFragment scanCardFragment = new ScanCardFragment();
+        scanCardFragment.interactionListener = listener;
+        scanCardFragment.containerResId = containerResId;
+        scanCardFragment.scanCardRequest = scanCardRequest;
+
+        fragment.getChildFragmentManager().beginTransaction()
+                .replace(containerResId, scanCardFragment, ScanCardFragment.TAG)
+                .setCustomAnimations(0, 0)
+                .commit();
+
+        final FragmentActivity activity = fragment.getActivity();
+        if (activity == null) {
+            return;
+        }
 
         ViewCompat.requestApplyInsets(activity.findViewById(android.R.id.content));
     }

@@ -6,8 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionAvailabilityChecker;
 import cards.pay.paycardsrecognizer.sdk.camera.RecognitionUnavailableException;
@@ -36,8 +36,6 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
                     return;
                 }
                 ScanCardFragment.start(activity, scanCardRequest, interactionListener, containerResId);
-                activity.getSupportFragmentManager()
-                        .popBackStackImmediate(TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             } else {
                 interactionListener.onInitLibraryFailed(result.getThrowable());
             }
@@ -60,7 +58,23 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(containerResId, fragment, InitLibraryFragment.TAG)
                 .setCustomAnimations(0, 0)
-                .disallowAddToBackStack()
+                .commit();
+    }
+
+    public static void start(
+            Fragment fragment,
+            ScanCardRequest scanCardRequest,
+            final InteractionListener interactionListener,
+            int containerResId
+    ) {
+        final InitLibraryFragment initLibraryFragment = new InitLibraryFragment();
+        initLibraryFragment.interactionListener = interactionListener;
+        initLibraryFragment.containerResId = containerResId;
+        initLibraryFragment.scanCardRequest = scanCardRequest;
+
+        fragment.getChildFragmentManager().beginTransaction()
+                .replace(containerResId, initLibraryFragment, InitLibraryFragment.TAG)
+                .setCustomAnimations(0, 0)
                 .commit();
     }
 
