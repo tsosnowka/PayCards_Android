@@ -32,12 +32,15 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             if (result.getResult() == DeployCoreTaskResult.SUCCESS) {
                 final FragmentActivity activity = getActivity();
                 if (activity == null || activity.isFinishing()) {
-                    interactionListener.onInitLibraryFailed(new Throwable());
+                    interactionListener.onScanCardFailed(new RecognitionUnavailableException(
+                            RecognitionUnavailableException.ERROR_NO_ACTIVITY));
                     return;
                 }
                 ScanCardFragment.start(activity, scanCardRequest, interactionListener, containerResId);
             } else {
-                interactionListener.onInitLibraryFailed(result.getThrowable());
+                interactionListener.onScanCardFailed(new RecognitionUnavailableException(
+                        result.getThrowable())
+                );
             }
         }
     };
@@ -104,7 +107,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
                 subscribeToInitCore();
             } else {
                 if (interactionListener != null) {
-                    interactionListener.onInitLibraryFailed(new RecognitionUnavailableException(
+                    interactionListener.onScanCardFailed(new RecognitionUnavailableException(
                             RecognitionUnavailableException.ERROR_NO_CAMERA_PERMISSION));
                 }
             }

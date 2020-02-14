@@ -5,8 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -28,10 +27,9 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
     public static final String RESULT_CANCEL_REASON = "RESULT_CANCEL_REASON";
     public static final int BACK_PRESSED = 1;
     public static final int ADD_MANUALLY_PRESSED = 2;
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static final String KEY_SCAN_CARD_REQUEST = "cards.pay.paycardsrecognizer.sdk.ui.ScanCardActivity.SCAN_CARD_REQUEST";
     private static final String TAG = "ScanCardActivity";
-    private final ScanCardService scanCardService = new ScanCardServiceImpl(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
+    private final ScanCardService scanCardService = new ScanCardServiceImpl();
     private View enterManuallyButton;
 
     @Override
@@ -46,11 +44,10 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
             }
         });
 
-        scanCardService.initScanCardLib();
+        scanCardService.initScanCardLib(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
     }
 
     @Override
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     public void onScanCardFailed(Exception e) {
         Log.e(TAG, "Scan card failed", new RuntimeException("onScanCardFinishedWithError()", e));
         setResult(RESULT_CODE_ERROR);
@@ -58,19 +55,17 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
     }
 
     @Override
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public void onScanCardFinished(Card card, @Nullable byte[] cardImage) {
+    public void onScanCardFinished(
+            @NonNull char[] cardNumber,
+            @NonNull String expirationDate,
+            @NonNull String cardHolder,
+            @NonNull byte[] cardImage
+    ) {
+        Card card = new Card(String.valueOf(cardNumber), cardHolder, expirationDate);
         Intent intent = new Intent();
         intent.putExtra(RESULT_PAYCARDS_CARD, (Parcelable) card);
         if (cardImage != null) intent.putExtra(RESULT_CARD_IMAGE, cardImage);
         setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    @Override
-    public void onInitLibraryFailed(Throwable e) {
-        Log.e(TAG, "Init library failed", new RuntimeException("onInitLibraryFailed()", e));
-        setResult(RESULT_CODE_ERROR);
         finish();
     }
 

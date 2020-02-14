@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
@@ -154,6 +155,9 @@ public class ScanCardFragment extends BaseScanCardFragment {
                     final Card card = new Card(result.getNumber(), result.getName(), date);
                     byte[] cardImage = mLastCardImage;
                     mLastCardImage = null;
+                    if (cardImage == null) {
+                        cardImage = new byte[0];
+                    }
                     finishWithResult(card, cardImage);
                 }
             }
@@ -228,9 +232,14 @@ public class ScanCardFragment extends BaseScanCardFragment {
         }
     }
 
-    private void finishWithResult(Card card, @Nullable byte[] cardImage) {
+    private void finishWithResult(@NonNull Card card, @NonNull byte[] cardImage) {
         if (interactionListener != null) {
-            interactionListener.onScanCardFinished(card, cardImage);
+            interactionListener.onScanCardFinished(
+                    card.getCardNumberChars(),
+                    card.getExpirationDate(),
+                    card.getCardHolderName(),
+                    cardImage
+            );
         }
     }
 

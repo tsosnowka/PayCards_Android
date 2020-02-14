@@ -14,6 +14,8 @@ public final class RecognitionUnavailableException extends Exception {
 
     public static final int ERROR_UNSUPPORTED_ARCHITECTURE = 5;
 
+    public static final int ERROR_NO_ACTIVITY = 6;
+
     public final int errorCode;
 
     public RecognitionUnavailableException() {
@@ -29,6 +31,11 @@ public final class RecognitionUnavailableException extends Exception {
         errorCode = ERROR_OTHER;
     }
 
+    public RecognitionUnavailableException(Throwable cause) {
+        super(cause);
+        this.errorCode = ERROR_OTHER;
+    }
+
     @Override
     public String getMessage() {
         switch (errorCode) {
@@ -42,6 +49,8 @@ public final class RecognitionUnavailableException extends Exception {
                 return "Camera not supported";
             case ERROR_UNSUPPORTED_ARCHITECTURE:
                 return "Unsupported architecture";
+            case ERROR_NO_ACTIVITY:
+                return "Provided activity can not be null";
             default:
                 return super.getMessage();
         }

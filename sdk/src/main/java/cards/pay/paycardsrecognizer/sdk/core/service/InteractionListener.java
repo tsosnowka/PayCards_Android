@@ -1,12 +1,15 @@
 package cards.pay.paycardsrecognizer.sdk.core.service;
 
-import cards.pay.paycardsrecognizer.sdk.Card;
+import android.support.annotation.NonNull;
 
 public interface InteractionListener {
 
-    void onInitLibraryFailed(Throwable e);
-
     void onScanCardFailed(Exception e);
 
-    void onScanCardFinished(Card card, byte[] cardImage);
+    void onScanCardFinished(
+            @NonNull char[] cardNumber,
+            @NonNull String expirationDate,
+            @NonNull String cardHolder,
+            @NonNull byte[] cardImage
+    );
 }

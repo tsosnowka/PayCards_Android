@@ -3,6 +3,7 @@ package cards.pay.paycardsrecognizer.sdk;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
@@ -31,6 +32,20 @@ public class Card implements Serializable, Parcelable {
         return mCardNumber;
     }
 
+    /**
+     * @return card number as char array (only digits)
+     */
+    @NonNull
+    public char[] getCardNumberChars() {
+        char[] cardNumberChars;
+        if (mCardNumber == null) {
+            cardNumberChars = new char[0];
+        } else {
+            cardNumberChars = mCardNumber.toCharArray();
+        }
+        return cardNumberChars;
+    }
+
     public String getCardNumberRedacted() {
         return CardUtils.getCardNumberRedacted(mCardNumber);
     }
@@ -38,17 +53,25 @@ public class Card implements Serializable, Parcelable {
     /**
      * @return card holder name
      */
-    @Nullable
+    @NonNull
     public String getCardHolderName() {
-        return mCardHolder;
+        if (mCardHolder == null) {
+            return "";
+        } else {
+            return mCardHolder;
+        }
     }
 
     /**
      * @return card expiration date in "MM/yy" format
      */
-    @Nullable
+    @NonNull
     public String getExpirationDate() {
-        return mExpirationDate;
+        if (mExpirationDate == null) {
+            return "";
+        } else {
+            return mExpirationDate;
+        }
     }
 
     @Override
