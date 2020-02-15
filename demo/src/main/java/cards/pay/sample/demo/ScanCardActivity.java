@@ -44,7 +44,7 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
             }
         });
 
-        scanCardService.initScanCardLib(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
+        scanCardService.startScanner(this, ScanCardRequest.getDefault(), this, R.id.scan_card_service_frame_layout);
     }
 
     @Override

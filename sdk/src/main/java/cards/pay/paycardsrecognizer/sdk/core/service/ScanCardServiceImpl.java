@@ -13,7 +13,7 @@ import cards.pay.paycardsrecognizer.sdk.ui.ScanCardFragment;
 public class ScanCardServiceImpl implements ScanCardService {
 
     @Override
-    public void initScanCardLib(
+    public void startScanner(
             Fragment fragment,
             ScanCardRequest scanCardRequest,
             InteractionListener interactionListener,
@@ -40,7 +40,7 @@ public class ScanCardServiceImpl implements ScanCardService {
     }
 
     @Override
-    public void initScanCardLib(
+    public void startScanner(
             AppCompatActivity activity,
             ScanCardRequest scanCardRequest,
             InteractionListener interactionListener,

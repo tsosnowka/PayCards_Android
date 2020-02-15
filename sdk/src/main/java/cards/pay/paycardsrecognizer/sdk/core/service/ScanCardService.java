@@ -5,14 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 
 public interface ScanCardService {
 
-    void initScanCardLib(
+    void startScanner(
             AppCompatActivity activity,
             ScanCardRequest scanCardRequest,
             InteractionListener interactionListener,
             int containerResId
     );
 
-    void initScanCardLib(
+    void startScanner(
             Fragment fragment,
             ScanCardRequest scanCardRequest,
             InteractionListener interactionListener,
