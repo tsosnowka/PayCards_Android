@@ -46,7 +46,8 @@ public final class ScanManager {
 
     private static SurfaceHolder sSurfaceHolder;
 
-    private final @RecognitionConstants.RecognitionMode int mRecognitionMode;
+    private final @RecognitionConstants.RecognitionMode
+    int mRecognitionMode;
 
     private final Context mAppContext;
 
@@ -67,22 +68,45 @@ public final class ScanManager {
     private final WindowRotationListener mWindowRotationListener;
 
     private final DisplayConfigurationImpl mDisplayConfiguration;
+    private final RecognitionStatusListener mRecognitionStatusListener = new RecognitionStatusListener() {
+        private long mRecognitionCompleteTs;
 
-    public interface Callbacks {
-        void onCameraOpened(Camera.Parameters cameraParameters);
-        void onOpenCameraError(Exception exception);
-        void onRecognitionComplete(RecognitionResult result);
-        void onCardImageReceived(Bitmap bitmap);
-        void onFpsReport(String report);
-        void onAutoFocusMoving(boolean start, String cameraFocusMode);
-        void onAutoFocusComplete(boolean success, String cameraFocusMode);
-    }
+        @Override
+        public void onRecognitionComplete(RecognitionResult result) {
+            getCardDetectionStateView().setRecognitionResult(result);
+            if (result.isFirst()) {
+                if (mRenderThread != null) mRenderThread.getHandler().sendPauseProcessFrames();
+                getCardDetectionStateView().setDetectionState(RecognitionConstants.DETECTED_BORDER_TOP
+                        | RecognitionConstants.DETECTED_BORDER_LEFT
+                        | RecognitionConstants.DETECTED_BORDER_RIGHT
+                        | RecognitionConstants.DETECTED_BORDER_BOTTOM
+                );
+                if (DBG) mRecognitionCompleteTs = System.nanoTime();
+            }
+            if (result.isFinal()) {
+                long newTs = System.nanoTime();
+                if (DBG)
+                    Log.v(TAG, String.format(Locale.US, "Final result received after %.3f ms", (newTs - mRecognitionCompleteTs) / 1_000_000f));
+            }
+            mCallbacks.onRecognitionComplete(result);
+        }
+
+        @Override
+        public void onCardImageReceived(Bitmap bitmap) {
+            if (DBG) {
+                long newTs = System.nanoTime();
+                Log.v(TAG, String.format(Locale.US, "Card image received after %.3f ms", (newTs - mRecognitionCompleteTs) / 1_000_000f));
+            }
+            mCallbacks.onCardImageReceived(bitmap);
+        }
+    };
 
     public ScanManager(Context context, CameraPreviewLayout previewLayout, Callbacks callbacks) {
         this(DEFAULT_RECOGNITION_MODE, context, previewLayout, callbacks);
     }
 
     public ScanManager(int recognitionMode, Context context, CameraPreviewLayout previewLayout, Callbacks callbacks) throws RuntimeException {
+        sSurfaceHolder = null;
         if (recognitionMode == 0) recognitionMode = DEFAULT_RECOGNITION_MODE;
         mRecognitionMode = recognitionMode;
         mAppContext = context.getApplicationContext();
@@ -101,7 +125,8 @@ public final class ScanManager {
         sh.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                if (DBG) Log.d(TAG, "SurfaceView  surfaceCreated holder=" + holder + " (static=" + sSurfaceHolder + ")");
+                if (DBG)
+                    Log.d(TAG, "SurfaceView  surfaceCreated holder=" + holder + " (static=" + sSurfaceHolder + ")");
                 if (sSurfaceHolder != null) {
                     throw new RuntimeException("sSurfaceHolder is already set");
                 }
@@ -127,8 +152,9 @@ public final class ScanManager {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                if (DBG) Log.d(TAG, "SurfaceView surfaceChanged fmt=" + format + " size=" + width + "x" + height +
-                        " holder=" + holder);
+                if (DBG)
+                    Log.d(TAG, "SurfaceView surfaceChanged fmt=" + format + " size=" + width + "x" + height +
+                            " holder=" + holder);
 
                 if (mRenderThread != null) {
                     RenderThread.RenderHandler rh = mRenderThread.getHandler();
@@ -240,7 +266,7 @@ public final class ScanManager {
     }
 
     private Display getDisplay() {
-        return ((WindowManager)mAppContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        return ((WindowManager) mAppContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
     }
 
     public void resetResult() {
@@ -266,7 +292,7 @@ public final class ScanManager {
     }
 
     public void setRecognitionCoreIdle(boolean idle) {
-        if (DBG) Log.d(TAG, "setRecognitionCoreIdle() called with: " +  "idle = [" + idle + "]");
+        if (DBG) Log.d(TAG, "setRecognitionCoreIdle() called with: " + "idle = [" + idle + "]");
         mRecognitionCore.setIdle(idle);
         if (mRenderThread != null) {
             if (idle) {
@@ -302,7 +328,7 @@ public final class ScanManager {
 
     @MainThread
     void onOpenCameraError(Exception e) {
-        if (DBG) Log.d(TAG, "onOpenCameraError() called with: " +  "e = [" + e + "]");
+        if (DBG) Log.d(TAG, "onOpenCameraError() called with: " + "e = [" + e + "]");
         if (mCallbacks != null) mCallbacks.onOpenCameraError(e);
         mRenderThread = null;
     }
@@ -310,14 +336,15 @@ public final class ScanManager {
     @MainThread
     void onRenderThreadError(Throwable e) {
         // XXX
-        if (DBG) Log.d(TAG, "onRenderThreadError() called with: " +  "e = [" + e + "]");
+        if (DBG) Log.d(TAG, "onRenderThreadError() called with: " + "e = [" + e + "]");
         if (mCallbacks != null) mCallbacks.onOpenCameraError((Exception) e);
         mRenderThread = null;
     }
 
     @MainThread
     void onFrameProcessed(int newBorders) {
-        if (mCallbacks != null) mPreviewLayout.getDetectionStateOverlay().setDetectionState(newBorders);
+        if (mCallbacks != null)
+            mPreviewLayout.getDetectionStateOverlay().setDetectionState(newBorders);
     }
 
     @MainThread
@@ -336,12 +363,12 @@ public final class ScanManager {
     }
 
     public void freezeCameraPreview() {
-        if (DBG) Log.d(TAG, "freezeCameraPreview() called with: " +  "");
+        if (DBG) Log.d(TAG, "freezeCameraPreview() called with: " + "");
         if (mRenderThread != null) mRenderThread.getHandler().sendFreeze();
     }
 
     public void unfreezeCameraPreview() {
-        if (DBG) Log.d(TAG, "unfreezeCameraPreview() called with: " +  "");
+        if (DBG) Log.d(TAG, "unfreezeCameraPreview() called with: " + "");
         if (mRenderThread != null) {
             mRenderThread.getHandler().sendUnfreeze();
         }
@@ -360,37 +387,21 @@ public final class ScanManager {
         sensorManager.unregisterListener(mShakeEventListener);
     }
 
-    private final RecognitionStatusListener mRecognitionStatusListener = new RecognitionStatusListener() {
-        private long mRecognitionCompleteTs;
+    public interface Callbacks {
+        void onCameraOpened(Camera.Parameters cameraParameters);
 
-        @Override
-        public void onRecognitionComplete(RecognitionResult result) {
-            getCardDetectionStateView().setRecognitionResult(result);
-            if (result.isFirst()) {
-                if (mRenderThread != null) mRenderThread.getHandler().sendPauseProcessFrames();
-                getCardDetectionStateView().setDetectionState(RecognitionConstants.DETECTED_BORDER_TOP
-                        | RecognitionConstants.DETECTED_BORDER_LEFT
-                        | RecognitionConstants.DETECTED_BORDER_RIGHT
-                        | RecognitionConstants.DETECTED_BORDER_BOTTOM
-                );
-                if (DBG) mRecognitionCompleteTs = System.nanoTime();
-            }
-            if (result.isFinal()) {
-                long newTs = System.nanoTime();
-                if (DBG) Log.v(TAG, String.format(Locale.US, "Final result received after %.3f ms", (newTs - mRecognitionCompleteTs) / 1_000_000f));
-            }
-            mCallbacks.onRecognitionComplete(result);
-        }
+        void onOpenCameraError(Exception exception);
 
-        @Override
-        public void onCardImageReceived(Bitmap bitmap) {
-            if (DBG) {
-                long newTs = System.nanoTime();
-                Log.v(TAG, String.format(Locale.US, "Card image received after %.3f ms", (newTs - mRecognitionCompleteTs) / 1_000_000f));
-            }
-            mCallbacks.onCardImageReceived(bitmap);
-        }
-    };
+        void onRecognitionComplete(RecognitionResult result);
+
+        void onCardImageReceived(Bitmap bitmap);
+
+        void onFpsReport(String report);
+
+        void onAutoFocusMoving(boolean start, String cameraFocusMode);
+
+        void onAutoFocusComplete(boolean success, String cameraFocusMode);
+    }
 
     private final SensorEventListener mShakeEventListener = new SensorEventListener() {
 

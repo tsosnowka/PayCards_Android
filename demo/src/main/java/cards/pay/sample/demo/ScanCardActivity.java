@@ -14,6 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
+import cards.pay.paycardsrecognizer.sdk.PaymentCard;
 import cards.pay.paycardsrecognizer.sdk.core.service.InteractionListener;
 import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardRequest;
 import cards.pay.paycardsrecognizer.sdk.core.service.ScanCardService;
@@ -48,22 +49,18 @@ public class ScanCardActivity extends AppCompatActivity implements InteractionLi
     }
 
     @Override
-    public void onScanCardFailed(Exception e) {
+    public void onScanCardFailed(@NonNull Exception e) {
         Log.e(TAG, "Scan card failed", new RuntimeException("onScanCardFinishedWithError()", e));
         setResult(RESULT_CODE_ERROR);
         finish();
     }
 
     @Override
-    public void onScanCardFinished(
-            @NonNull char[] cardNumber,
-            @NonNull String expirationDate,
-            @NonNull String cardHolder,
-            @NonNull byte[] cardImage
-    ) {
-        Card card = new Card(String.valueOf(cardNumber), cardHolder, expirationDate);
+    public void onScanCardFinished(@NonNull PaymentCard paymentCard) {
+        Card card = new Card(String.valueOf(paymentCard.getCardNumber()), paymentCard.getCardHolder(), paymentCard.getExpirationDate());
         Intent intent = new Intent();
         intent.putExtra(RESULT_PAYCARDS_CARD, (Parcelable) card);
+        byte[] cardImage = paymentCard.getCardImage();
         if (cardImage != null) intent.putExtra(RESULT_CARD_IMAGE, cardImage);
         setResult(RESULT_OK, intent);
         finish();

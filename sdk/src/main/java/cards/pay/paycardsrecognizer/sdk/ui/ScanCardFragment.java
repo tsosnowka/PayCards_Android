@@ -18,6 +18,7 @@ import android.view.View;
 import java.io.ByteArrayOutputStream;
 
 import cards.pay.paycardsrecognizer.sdk.Card;
+import cards.pay.paycardsrecognizer.sdk.PaymentCard;
 import cards.pay.paycardsrecognizer.sdk.R;
 import cards.pay.paycardsrecognizer.sdk.camera.ScanManager;
 import cards.pay.paycardsrecognizer.sdk.core.base.BaseScanCardFragment;
@@ -193,20 +194,20 @@ public class ScanCardFragment extends BaseScanCardFragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         if (mScanManager != null) {
             mScanManager.onPause();
         }
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (mSoundPool != null) {
             mSoundPool.release();
             mSoundPool = null;
         }
         mCapturedSoundId = -1;
+        super.onDestroy();
     }
 
     private void innitSoundPool() {
@@ -225,10 +226,12 @@ public class ScanCardFragment extends BaseScanCardFragment {
     private void finishWithResult(@NonNull Card card, @NonNull byte[] cardImage) {
         if (interactionListener != null) {
             interactionListener.onScanCardFinished(
-                    card.getCardNumberChars(),
-                    card.getExpirationDate(),
-                    card.getCardHolderName(),
-                    cardImage
+                    new PaymentCard(
+                            card.getCardNumberChars(),
+                            card.getExpirationDate(),
+                            card.getCardHolderName(),
+                            cardImage
+                    )
             );
         }
     }
