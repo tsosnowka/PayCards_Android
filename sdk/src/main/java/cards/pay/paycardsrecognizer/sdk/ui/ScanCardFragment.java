@@ -113,10 +113,9 @@ public class ScanCardFragment extends BaseScanCardFragment {
                 }
                 mProgressBar.hideSlow();
                 mCameraPreviewLayout.setBackgroundDrawable(null);
-                if (mFlashButton != null) {
-                    mFlashButton.setVisibility(isFlashSupported ? View.VISIBLE : View.GONE);
+                if (shouldShowFlashButton()) {
+                    showFlashButton(isFlashSupported);
                 }
-
                 innitSoundPool();
             }
 
@@ -182,6 +181,16 @@ public class ScanCardFragment extends BaseScanCardFragment {
                 return result;
             }
         });
+    }
+
+    private boolean shouldShowFlashButton() {
+        return false;
+    }
+
+    private void showFlashButton(boolean isFlashSupported) {
+        if (mFlashButton != null) {
+            mFlashButton.setVisibility(isFlashSupported ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override

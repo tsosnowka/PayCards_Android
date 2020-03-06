@@ -25,6 +25,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     public static final String TAG = "InitLibraryFragment";
 
     public static final int REQUEST_CAMERA_PERMISSION_CODE = 1;
+    private static boolean shouldAskPermission = false;
 
     private DeployCoreTaskCallback deployCoreTaskCallback = new DeployCoreTaskCallback() {
         @Override
@@ -54,6 +55,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             final InteractionListener interactionListener,
             int containerResId
     ) {
+        shouldAskPermission = true;
         final InitLibraryFragment fragment = new InitLibraryFragment();
         fragment.interactionListener = interactionListener;
         fragment.containerResId = containerResId;
@@ -71,6 +73,7 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
             final InteractionListener interactionListener,
             int containerResId
     ) {
+        shouldAskPermission = true;
         final InitLibraryFragment initLibraryFragment = new InitLibraryFragment();
         initLibraryFragment.interactionListener = interactionListener;
         initLibraryFragment.containerResId = containerResId;
@@ -91,12 +94,14 @@ public final class InitLibraryFragment extends BaseScanCardFragment {
     public void onStart() {
         super.onStart();
         final RecognitionAvailabilityChecker.Result checkResult = RecognitionAvailabilityChecker.doCheck(getContext());
-        if (checkResult.isFailedOnCameraPermission()) {
+        if (shouldAskPermission && checkResult.isFailedOnCameraPermission()) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
+            shouldAskPermission = false;
         } else {
             subscribeToInitCore();
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
